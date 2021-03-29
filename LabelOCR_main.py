@@ -1,5 +1,5 @@
 import sys, os
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QGraphicsPixmapItem, QGraphicsScene, QApplication
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QGraphicsPixmapItem, QGraphicsScene, QApplication,QMessageBox
 from PyQt5.QtGui import QPixmap
 import LabelOCR, LogBrowser
 
@@ -76,10 +76,12 @@ class MainCode(QMainWindow, LabelOCR.Ui_MainWindow):
             self.img_dir = img_dir
 
         f = sorted(glob(img_dir + os.sep + "*.*"))
-        self.image_files = [x.replace('/', os.sep) for x in f if os.path.splitext(x)[-1].lower() in img_formats]
-        if self.image_files == []:
-            QMainWindow.QMessageBox.critical(self, "Ooooops", "目录里没有支持的图片。")
+        image_files = [x.replace('/', os.sep) for x in f if os.path.splitext(x)[-1].lower() in img_formats]
+        if len(image_files) == 0:
+            reply = QMessageBox.question(self, 'Ooooops', '目录里没有支持的图片。', QMessageBox.Yes)
             return
+        else:
+            self.image_files= image_files
         self.img_num_total = len(self.image_files)
 
         self.logger(self.img_dir, LOAD_IMG)
@@ -100,7 +102,7 @@ class MainCode(QMainWindow, LabelOCR.Ui_MainWindow):
             return True
 
         except:
-            QMainWindow.QMessageBox.critical(self, "错误", "载入图片目录失败。")
+            QMessageBox.question(self, 'Ooooops', '目录里没有支持的图片。', QMessageBox.Yes)
             return False
 
     def show_img_rescled(self):
@@ -138,7 +140,6 @@ class MainCode(QMainWindow, LabelOCR.Ui_MainWindow):
     def go_to_page(self, state):
         if self.img_dir is None:
             return
-            # QMainWindow.QMessageBox.critical(self, "Ooooops", "先选择图像目录吧，亲。")
 
         if state == LAST_PAGE:
             if self.page_now > 0:
@@ -155,7 +156,7 @@ class MainCode(QMainWindow, LabelOCR.Ui_MainWindow):
             if 0 <= self.spinBox_page.value() - 1 < self.img_num_total:
                 self.page_now = self.spinBox_page.value() - 1
             else:
-                QMainWindow.QMessageBox.critical(self, "Ooooops", "跳转页码超范围啦。")
+                QMessageBox.question(self, 'Ooooops', '跳转页码超范围啦。', QMessageBox.Yes)
                 return
 
         if state == LAST_PAGE or state == NEXT_PAGE:
