@@ -77,6 +77,9 @@ class MainCode(QMainWindow, LabelOCR.Ui_MainWindow):
 
         f = sorted(glob(img_dir + os.sep + "*.*"))
         self.image_files = [x.replace('/', os.sep) for x in f if os.path.splitext(x)[-1].lower() in img_formats]
+        if self.image_files == []:
+            QMainWindow.QMessageBox.critical(self, "Ooooops", "目录里没有支持的图片。")
+            return
         self.img_num_total = len(self.image_files)
 
         self.logger(self.img_dir, LOAD_IMG)
